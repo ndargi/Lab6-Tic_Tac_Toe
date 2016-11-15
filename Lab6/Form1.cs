@@ -19,16 +19,21 @@ namespace Lab6
         private const float block = lineLength / 3;
         private const float offset = 10;
         private const float delta = 5;
-        private enum CellSelection { N, O, X };
-        private CellSelection[,] grid = new CellSelection[3, 3];
+        public enum CellSelection { N, O, X };
+        private CellSelection[,] grid;
         private float scale; //current scale factor
+        private bool firstmove = true;//True if the user will go first otherwise false;
+        private GameEngine Engine = new GameEngine();
         public Form1()
         {
             InitializeComponent();
             ResizeRedraw = true;
+            grid = Engine.enginegrid;//Initialize the grid using the game engine
+
         }
         protected override void OnPaint(PaintEventArgs e)
         {
+            grid = Engine.enginegrid;//get the status of the board from the game engine
             base.OnPaint(e);
             Graphics g = e.Graphics;
             ApplyTransform(g);
@@ -41,11 +46,11 @@ namespace Lab6
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (grid[i,j] == CellSelection.O)
+                    if (grid[i, j] == CellSelection.O)
                     {
                         DrawO(i, j, g);
                     }
-                    else if (grid[i,j] == CellSelection.X)
+                    else if (grid[i, j] == CellSelection.X)
                     {
                         DrawX(i, j, g);
                     }
@@ -64,13 +69,18 @@ namespace Lab6
             g.DrawLine(Pens.Black, i * block + delta, j * block + delta, (i * block) + block - delta, (j * block) + block - delta);
             g.DrawLine(Pens.Black, (i * block) + block - delta, j * block + delta, (i * block) + delta, (j * block) + block - delta);
         }
-        private void DrawO(int i,int j, Graphics g)
+        private void DrawO(int i, int j, Graphics g)
         {
             g.DrawEllipse(Pens.Black, i * block + delta, j * block + delta, block - 2 * delta, block - 2 * delta);
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
+            if (firstmove)
+            {
+                computerStartsToolStripMenuItem.Enabled = false;
+                
+            }
             Graphics g = CreateGraphics();
             ApplyTransform(g);
             PointF[] p = { new Point(e.X, e.Y) };
@@ -78,25 +88,50 @@ namespace Lab6
             if (p[0].X < 0 || p[0].Y < 0) return;
             int i = (int)(p[0].X / block);
             int j = (int)(p[0].Y / block);
-            if (i > 2 || j > 2) return;
-            if (e.Button == MouseButtons.Middle)
+            if (i > 2 || j > 2) { return; }
+            if (e.Button == MouseButtons.Left)//Only enter if it is a left click
             {
-                grid[i, j] = CellSelection.N;
-                //only allow setting empty cells
+                if (Engine.LegalMove(i, j))//Will check if move is legal, and if it is it will add the move to the board
+                {
+               
+                    AIMove();//Legal move has happened, let the AI move
+                }
+                else
+                {
+                    MessageBox.Show("Illegal Move");
+                }
             }
-                if (grid[i,j] == CellSelection.N)
+            Invalidate();            
+        }
+
+        private void computerStartsToolStripMenuItem_MouseDown(object sender, MouseEventArgs e)
+        {
+            computerStartsToolStripMenuItem.Enabled = false;
+            firstmove = false;
+            Engine.nextentry = CellSelection.O;//Change the next move to O since computer is starting;
+            AIMove();
+            Invalidate();
+        }
+        private void AIMove()//Will be called when it is time for the AI to perform a move
+        {
+            Invalidate();
+            string status = Engine.ComputerMove();//Calls the method for the AI to make its move, logic and board manipulation done inside GameEngine
+            if (status == "w")
             {
-                if (e.Button == MouseButtons.Left)
-                {
-                    grid[i, j] = CellSelection.O;
-                }
-                if (e.Button == MouseButtons.Right)
-                {
-                    grid[i, j] = CellSelection.X;
-                }
+                MessageBox.Show("Congratulations, You Win!");
+            }
+            else if (status == "l")
+            {
+                MessageBox.Show("You Lose!");
             }
             Invalidate();
-            
+        }
+        private void newToolStripMenuItem_MouseDown(object sender, MouseEventArgs e)
+        {
+            Engine = new GameEngine();
+            firstmove = true;
+            computerStartsToolStripMenuItem.Enabled = true;
+            Invalidate();
         }
     }
 }
