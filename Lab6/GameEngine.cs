@@ -16,6 +16,7 @@ namespace Lab6
         {
             enginegrid = new CellSelection[3, 3];//Initialize grid when the game engine is constructed
         }
+
         public bool LegalMove(int i, int j)//Method will check if the move is allowed and return true or false
         {
             if (enginegrid[i, j] == CellSelection.N)
@@ -33,6 +34,7 @@ namespace Lab6
             }
             return false;
         }
+
         public string ComputerMove()//Will be called to perform a move and manipulate the game board inside of the engine
             //Will return n if no game status is to report, l if user has lost or w if user has won
         {
@@ -48,29 +50,7 @@ namespace Lab6
             {
                 return "l";
             }
-            Random rnd = new Random();
-            int rndi = rnd.Next(0, 3);
-            int rndj = rnd.Next(0, 3);
-            while (true)
-            {
-                if (enginegrid[rndi, rndj] == CellSelection.N)
-                {
-                    enginegrid[rndi, rndj] = nextentry;
-                    if (nextentry == CellSelection.O)
-                    {
-                        nextentry = CellSelection.X;
-                        
-                    }
-                    else
-                    {
-                        nextentry = CellSelection.O;
-                        
-                    }
-                    break;
-                }
-                rndi = rnd.Next(0, 3);
-                rndj = rnd.Next(0, 3);
-            }
+            MOVE();//Perform the AI Move
             gamestatus = Checker();//Checks if the game is now over
             if (gamestatus == "w")
             {
@@ -150,6 +130,276 @@ namespace Lab6
                 }
             }
             return "n";
+        }
+
+        private void MOVE()//Will perform the computers move, either blocking winning or random
+        {
+            //First check for winning move
+            for (int i = 0; i < 3; i++)//Check each column
+            {
+                if ((enginegrid[i,0] == CellSelection.O) && (enginegrid[i, 1] == CellSelection.O))
+                {
+                    if (enginegrid[i, 2] == CellSelection.N)
+                    {
+                        enginegrid[i, 2] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[i, 1] == CellSelection.O) && (enginegrid[i, 2] == CellSelection.O))
+                {
+                    if (enginegrid[i, 0] == CellSelection.N)
+                    {
+                        enginegrid[i, 0] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[i, 0] == CellSelection.O) && (enginegrid[i, 2] == CellSelection.O))
+                {
+                    if (enginegrid[i, 1] == CellSelection.N)
+                    {
+                        enginegrid[i, 1] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+            }
+
+            for (int j = 0; j < 3; j++)//Check each row
+            {
+                if ((enginegrid[0, j] == CellSelection.O) && (enginegrid[1, j] == CellSelection.O))
+                {
+                    if (enginegrid[2, j] == CellSelection.N)
+                    {
+                        enginegrid[2, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[1, j] == CellSelection.O) && (enginegrid[2, j] == CellSelection.O))
+                {
+                    if (enginegrid[0, j] == CellSelection.N)
+                    {
+                        enginegrid[0, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[0, j] == CellSelection.O) && (enginegrid[2, j] == CellSelection.O))
+                {
+                    if (enginegrid[1, j] == CellSelection.N)
+                    {
+                        enginegrid[1, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+            }
+            //Check Diagonals
+            if ((enginegrid[0, 0] == CellSelection.O) && (enginegrid[1,1] == CellSelection.O))
+            {
+                if (enginegrid[2, 2] == CellSelection.N)
+                {
+                    enginegrid[2, 2] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[1, 1] == CellSelection.O) && (enginegrid[2, 2] == CellSelection.O))
+            {
+                if (enginegrid[0, 0] == CellSelection.N)
+                {
+                    enginegrid[0, 0] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[0, 0] == CellSelection.O) && (enginegrid[2, 2] == CellSelection.O))
+            {
+                if (enginegrid[1, 1] == CellSelection.N)
+                {
+                    enginegrid[1, 1] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+
+            //Check Anti-Diagonals
+            if ((enginegrid[2, 0] == CellSelection.O) && (enginegrid[1, 1] == CellSelection.O))
+            {
+                if (enginegrid[0, 2] == CellSelection.N)
+                {
+                    enginegrid[0, 2] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[2, 0] == CellSelection.O) && (enginegrid[0, 2] == CellSelection.O))
+            {
+                if (enginegrid[1, 1] == CellSelection.N)
+                {
+                    enginegrid[1, 1] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[0, 2] == CellSelection.O) && (enginegrid[1,1] == CellSelection.O))
+            {
+                if (enginegrid[2,0] == CellSelection.N)
+                {
+                    enginegrid[2, 0] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+
+            //Then check for blocking move
+
+            for (int i = 0; i < 3; i++)//Check each column
+            {
+                if ((enginegrid[i, 0] == CellSelection.X) && (enginegrid[i, 1] == CellSelection.X))
+                {
+                    if (enginegrid[i, 2] == CellSelection.N)
+                    {
+                        enginegrid[i, 2] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[i, 1] == CellSelection.X) && (enginegrid[i, 2] == CellSelection.X))
+                {
+                    if (enginegrid[i, 0] == CellSelection.N)
+                    {
+                        enginegrid[i, 0] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[i, 0] == CellSelection.X) && (enginegrid[i, 2] == CellSelection.X))
+                {
+                    if (enginegrid[i, 1] == CellSelection.N)
+                    {
+                        enginegrid[i, 1] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+            }
+
+            for (int j = 0; j < 3; j++)//Check each row
+            {
+                if ((enginegrid[0, j] == CellSelection.X) && (enginegrid[1, j] == CellSelection.X))
+                {
+                    if (enginegrid[2, j] == CellSelection.N)
+                    {
+                        enginegrid[2, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[1, j] == CellSelection.X) && (enginegrid[2, j] == CellSelection.X))
+                {
+                    if (enginegrid[0, j] == CellSelection.N)
+                    {
+                        enginegrid[0, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+                else if ((enginegrid[0, j] == CellSelection.X) && (enginegrid[2, j] == CellSelection.X))
+                {
+                    if (enginegrid[1, j] == CellSelection.N)
+                    {
+                        enginegrid[1, j] = CellSelection.O;
+                        nextentry = CellSelection.X;
+                        return;
+                    }
+                }
+            }
+            //Check Diagonals
+            if ((enginegrid[0, 0] == CellSelection.X) && (enginegrid[1, 1] == CellSelection.X))
+            {
+                if (enginegrid[2,2] == CellSelection.N)
+                {
+                    enginegrid[2, 2] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[1, 1] == CellSelection.X) && (enginegrid[2, 2] == CellSelection.X))
+            {
+                if (enginegrid[0,0] == CellSelection.N)
+                {
+                    enginegrid[0, 0] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[0, 0] == CellSelection.X) && (enginegrid[2, 2] == CellSelection.X))
+            {
+                if (enginegrid[1, 1] == CellSelection.N)
+                {
+                    enginegrid[1, 1] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+
+            //Check Anti-Diagonals
+            if ((enginegrid[2, 0] == CellSelection.X) && (enginegrid[1, 1] == CellSelection.X))
+            {
+                if (enginegrid[0, 2] == CellSelection.N)
+                {
+                    enginegrid[0, 2] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[2, 0] == CellSelection.X) && (enginegrid[0, 2] == CellSelection.X))
+            {
+                if (enginegrid[1, 1] == CellSelection.N)
+                {
+                    enginegrid[1, 1] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+            else if ((enginegrid[0, 2] == CellSelection.X) && (enginegrid[1, 1] == CellSelection.X))
+            {
+                if (enginegrid[2,0] == CellSelection.N)
+                {
+                    enginegrid[2,0] = CellSelection.O;
+                    nextentry = CellSelection.X;
+                    return;
+                }
+            }
+
+
+            //Below is the random move if no blocking or winning happens
+            Random rnd = new Random();
+            int rndi = rnd.Next(0, 3);
+            int rndj = rnd.Next(0, 3);
+            while (true)
+            {
+                if (enginegrid[rndi, rndj] == CellSelection.N)
+                {
+                    enginegrid[rndi, rndj] = nextentry;
+                    if (nextentry == CellSelection.O)
+                    {
+                        nextentry = CellSelection.X;
+
+                    }
+                    else
+                    {
+                        nextentry = CellSelection.O;
+
+                    }
+                    return;
+                }
+                rndi = rnd.Next(0, 3);
+                rndj = rnd.Next(0, 3);
+            }
         }
     }
 }
