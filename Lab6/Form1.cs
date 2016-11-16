@@ -124,6 +124,10 @@ namespace Lab6
             {
                 MessageBox.Show("You Lose!");
             }
+            else if (status== "t")
+            {
+                MessageBox.Show("You Tied!");
+            }
             Invalidate();
         }
         private void newToolStripMenuItem_MouseDown(object sender, MouseEventArgs e)

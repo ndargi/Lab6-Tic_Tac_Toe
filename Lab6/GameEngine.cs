@@ -50,6 +50,10 @@ namespace Lab6
             {
                 return "l";
             }
+            else if (gamestatus == "t")
+            {
+                return "t";
+            }
             MOVE();//Perform the AI Move
             gamestatus = Checker();//Checks if the game is now over
             if (gamestatus == "w")
@@ -59,6 +63,10 @@ namespace Lab6
             else if (gamestatus == "l")
             {
                 return "l";
+            }
+            else if (gamestatus == "t")
+            {
+                return "t";
             }
             return "n";
         }
@@ -129,7 +137,23 @@ namespace Lab6
                     }
                 }
             }
-            return "n";
+            //Check if the game has ended in a tie
+            bool istie = true;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (enginegrid[i,j] == CellSelection.N)
+                    {
+                        istie = false;
+                    }
+                }
+            }
+            if (istie)
+            {
+                return "t";
+            }
+                return "n";
         }
 
         private void MOVE()//Will perform the computers move, either blocking winning or random
@@ -375,6 +399,14 @@ namespace Lab6
                 }
             }
 
+            //Default move to the middle if it is open, makes the game even better
+
+            if (enginegrid[1,1] == CellSelection.N)
+            {
+                enginegrid[1, 1] = CellSelection.O;
+                nextentry = CellSelection.X;
+                return;
+            }
 
             //Below is the random move if no blocking or winning happens
             Random rnd = new Random();
