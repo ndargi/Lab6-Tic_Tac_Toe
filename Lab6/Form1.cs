@@ -19,6 +19,7 @@ namespace Lab6
         private const float block = lineLength / 3;
         private const float offset = 10;
         private const float delta = 5;
+        private bool gameover = false;
         public enum CellSelection { N, O, X };
         private CellSelection[,] grid;
         private float scale; //current scale factor
@@ -76,32 +77,35 @@ namespace Lab6
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (firstmove)
+            if (!gameover)//Nothing will happen if the game is over
             {
-                computerStartsToolStripMenuItem.Enabled = false;
-                
-            }
-            Graphics g = CreateGraphics();
-            ApplyTransform(g);
-            PointF[] p = { new Point(e.X, e.Y) };
-            g.TransformPoints(CoordinateSpace.World, CoordinateSpace.Device, p);
-            if (p[0].X < 0 || p[0].Y < 0) return;
-            int i = (int)(p[0].X / block);
-            int j = (int)(p[0].Y / block);
-            if (i > 2 || j > 2) { return; }
-            if (e.Button == MouseButtons.Left)//Only enter if it is a left click
-            {
-                if (Engine.LegalMove(i, j))//Will check if move is legal, and if it is it will add the move to the board
+                if (firstmove)
                 {
-               
-                    AIMove();//Legal move has happened, let the AI move
+                    computerStartsToolStripMenuItem.Enabled = false;
+
                 }
-                else
+                Graphics g = CreateGraphics();
+                ApplyTransform(g);
+                PointF[] p = { new Point(e.X, e.Y) };
+                g.TransformPoints(CoordinateSpace.World, CoordinateSpace.Device, p);
+                if (p[0].X < 0 || p[0].Y < 0) return;
+                int i = (int)(p[0].X / block);
+                int j = (int)(p[0].Y / block);
+                if (i > 2 || j > 2) { return; }
+                if (e.Button == MouseButtons.Left)//Only enter if it is a left click
                 {
-                    MessageBox.Show("Illegal Move");
+                    if (Engine.LegalMove(i, j))//Will check if move is legal, and if it is it will add the move to the board
+                    {
+
+                        AIMove();//Legal move has happened, let the AI move
+                    }
+                    else
+                    {
+                        MessageBox.Show("Illegal Move");
+                    }
                 }
-            }
-            Invalidate();            
+                Invalidate();
+            }            
         }
 
         private void computerStartsToolStripMenuItem_MouseDown(object sender, MouseEventArgs e)
@@ -116,17 +120,20 @@ namespace Lab6
         {
             Invalidate();
             string status = Engine.ComputerMove();//Calls the method for the AI to make its move, logic and board manipulation done inside GameEngine
-            if (status == "w")
+            if (status == "w")//Below is how the form knows what the game engine means/if no moves should be allowed
             {
                 MessageBox.Show("Congratulations, You Win!");
+                gameover = true;
             }
             else if (status == "l")
             {
                 MessageBox.Show("You Lose!");
+                gameover = true;
             }
             else if (status== "t")
             {
                 MessageBox.Show("You Tied!");
+                gameover = true;
             }
             Invalidate();
         }
@@ -134,6 +141,7 @@ namespace Lab6
         {
             Engine = new GameEngine();
             firstmove = true;
+            gameover = false;
             computerStartsToolStripMenuItem.Enabled = true;
             Invalidate();
         }
